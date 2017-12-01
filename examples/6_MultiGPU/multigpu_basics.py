@@ -75,7 +75,7 @@ with tf.device('/gpu:0'):
     c2.append(matpow(a, n))
 
 # GPU:1 computes B^n
-with tf.device('/gpu:1'):
+with tf.device('/gpu:0'): # Sorry :( no GPU:1
     # Compute B^n and store result in c2
     b = tf.placeholder(tf.float32, [10000, 10000])
     c2.append(matpow(b, n))
@@ -92,3 +92,21 @@ t2_2 = datetime.datetime.now()
 
 print("Single GPU computation time: " + str(t2_1-t1_1))
 print("Multi GPU computation time: " + str(t2_2-t1_2))
+
+'''
+CPU computing
+'''
+c3 = []
+
+with tf.device('/cpu:0'):
+    c3.append(matpow(a, n))
+    c3.append(matpow(b, n))
+    sum = tf.add_n(c3)
+
+t1_3 = datetime.datetime.now()
+with tf.Session(config=tf.ConfigProto(log_device_placement=log_device_placement)) as sess:
+    # Run the op.
+    sess.run(sum, {a:A, b:B})
+t2_3 = datetime.datetime.now()
+
+print("CPU computation time: " + str(t2_3-t1_3))
