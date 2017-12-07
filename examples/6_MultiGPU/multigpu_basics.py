@@ -56,7 +56,7 @@ with tf.device('/gpu:0'):
     c1.append(matpow(b, n))
 
 with tf.device('/cpu:0'):
-  sum = tf.add_n(c1) #Addition of all elements in c1, i.e. A^n + B^n
+  sum = tf.add_n(c1)  # Addition of all elements in c1, i.e. A^n + B^n
 
 t1_1 = datetime.datetime.now()
 with tf.Session(config=tf.ConfigProto(log_device_placement=log_device_placement)) as sess:
@@ -81,7 +81,7 @@ with tf.device('/gpu:0'): # Sorry :( no GPU:1
     c2.append(matpow(b, n))
 
 with tf.device('/cpu:0'):
-  sum = tf.add_n(c2) #Addition of all elements in c2, i.e. A^n + B^n
+  sum = tf.add_n(c2)  # Addition of all elements in c2, i.e. A^n + B^n
 
 t1_2 = datetime.datetime.now()
 with tf.Session(config=tf.ConfigProto(log_device_placement=log_device_placement)) as sess:
