@@ -1,3 +1,8 @@
+"""
+Logistic regression on radar datasets implemented using loss and regularization formulae from Andrew Ng's site
+(http://www.ritchieng.com/machine-learning/deep-learning/tensorflow/regularization/)
+"""
+
 from __future__ import print_function
 
 import numpy as np, pandas as pd
@@ -33,8 +38,13 @@ onehot_labels = onehot.transform(encoded_labels).toarray()
 
 # print("One-Hot labels: %s\n" % onehot_labels)
 
-# Learning rate
-learning_rate = 0.01
+# Training epoch, display step
+training_epochs = 1500
+display_step = 100
+
+# Learning rate, beta
+learning_rate = 0.5
+beta = 0.0001
 
 # Initialize placeholders
 x = tf.placeholder(tf.float32, [None,num_features])
@@ -45,10 +55,12 @@ W = tf.Variable(tf.zeros([num_features,num_classes]))
 b = tf.Variable(tf.zeros([num_classes]))
 
 # Construct model
-pred = tf.nn.softmax(tf.matmul(x, W) + b)  # Softmax
+logits = tf.matmul(x, W) + b # Logits
+pred = tf.nn.softmax(logits)  # Softmax
+regularizer = tf.nn.l2_loss(W) # l2 regularization
 
 # Minimize error using cross entropy
-cost = tf.reduce_mean(-tf.reduce_sum(y * tf.log(pred), reduction_indices=1))
+cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=logits,labels=y)+beta*regularizer)
 
 # Gradient Descent
 optimizer = tf.train.GradientDescentOptimizer(learning_rate).minimize(cost)
@@ -60,9 +72,6 @@ accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
 # Initialize the variables (i.e. assign their default value)
 init = tf.global_variables_initializer()
-
-training_epochs = 1000
-display_step = 100
 
 # Start training
 with tf.Session() as sess:
