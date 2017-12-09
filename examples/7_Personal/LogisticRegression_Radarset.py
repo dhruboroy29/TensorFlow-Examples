@@ -114,6 +114,10 @@ with tf.Session() as sess:
     # 10-fold crossvalidation accuracy
     acc_cv = 0
 
+    # Initialize csv list
+    csv_data = []
+    csv_list = [beta, learning_rate]
+
     t3 = datetime.datetime.now()
     for train_index, test_index in kf.split(data):
         # print("Train: ", train_index, "Test: ", test_index)
@@ -135,10 +139,14 @@ with tf.Session() as sess:
         print('Optimization finished! Cost=%s' % c)
 
         # Now test corresponding test partition
-        print("Round accuracy: ", accuracy.eval({x: data, y: onehot_labels}), '\n')
-        acc_cv+= accuracy.eval({x: X_test, y: y_test})
-
+        acc_round = accuracy.eval({x: data, y: onehot_labels})
+        print("Round accuracy: ", acc_round, '\n')
+        acc_cv+= acc_round
+        csv_list.append(acc_round)
     t4 = datetime.datetime.now()
+
+    # Append row to csv_data
+    csv_data.append(csv_list)
 
     # Print runtime
     print('Optimization running time: %ss' % (t4 - t3))
@@ -146,3 +154,5 @@ with tf.Session() as sess:
     # Print 10-fold crossvalidation accuracy
     print("10-fold cross-validation accuracy: ", acc_cv/10, '\n')
 
+    # Save cross-validation output
+    np.savetxt("10fold.csv", csv_data, delimiter=',')
