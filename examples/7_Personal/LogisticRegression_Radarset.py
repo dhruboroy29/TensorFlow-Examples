@@ -39,7 +39,7 @@ onehot_labels = onehot.transform(encoded_labels).toarray()
 # print("One-Hot labels: %s\n" % onehot_labels)
 
 # Training epoch, display step
-training_epochs = 1500
+training_epochs = 2000
 display_step = 100
 
 # Learning rate, beta
@@ -83,6 +83,10 @@ with tf.Session() as sess:
     print('##########################################')
     print('#Logistic Regression - No Crossvalidation#')
     print('##########################################')
+
+    # Print starting cost
+    init_cost = sess.run(cost, feed_dict={x: data, y: onehot_labels})
+    print("Epoch:", '%04d' % 0, "cost=", "{:.9f}".format(init_cost))
 
     t1 = datetime.datetime.now()
     for epoch in range(training_epochs):
@@ -128,6 +132,10 @@ with tf.Session() as sess:
         X_train, X_test = data[train_index], data[test_index]
         y_train, y_test = onehot_labels[train_index], onehot_labels[test_index]
 
+        # Print starting cost
+        init_cost = sess.run(cost, feed_dict={x: X_train, y: y_train})
+        print("Epoch:", '%04d' % 0 , "cost=", "{:.9f}".format(init_cost))
+
         # Train for each partition
         for epoch in range(training_epochs):
             # Run optimization
@@ -135,11 +143,11 @@ with tf.Session() as sess:
             if (epoch + 1) % display_step == 0:
                 print("Epoch:", '%04d' % (epoch + 1), "cost=", "{:.9f}".format(c))
 
-            # Print cost
+        # Print cost
         print('Optimization finished! Cost=%s' % c)
 
         # Now test corresponding test partition
-        acc_round = accuracy.eval({x: data, y: onehot_labels})
+        acc_round = accuracy.eval({x: X_test, y: y_test})
         print("Round accuracy: ", acc_round, '\n')
         acc_cv+= acc_round
         csv_list.append(acc_round)
