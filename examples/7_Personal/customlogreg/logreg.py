@@ -152,3 +152,5 @@ def logreg_nomad(train_filename, test_filenames, beta, learning_rate, training_e
     return csv_10foldtrain, csv_10foldtest
 
 
+if __name__ == "__main__":
+    print('Huribaba')
