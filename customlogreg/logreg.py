@@ -7,6 +7,7 @@ from sklearn.model_selection import KFold
 import os
 import datetime
 
+
 def logreg_nomad(train_filename, test_filenames, beta, learning_rate, training_epochs, display_step):
     # Process .arff file
     dataset = arff.loadarff(train_filename)
@@ -186,13 +187,13 @@ if __name__ == '__main__':
     base_path = '/Users/Balderdash/Documents/BigEnvs_LogReg/BigEnvs_LogReg'
     rounds = [2, 3, 4, 5]
     beta_list = [0.1, 0.01, 0.001, 0.0001]
-    training_epochs = 2000
-    display_step = 100
-    learning_rate = 0.5
+    epochs = 2000
+    step = 100
+    rate = 0.5
 
     for round in rounds:
         t1 = datetime.datetime.now()
-        run_logreg(base_path, round, beta_list, learning_rate, training_epochs, display_step)
+        run_logreg(base_path, round, beta_list, learning_rate=rate, training_epochs=epochs, display_step=step)
         t2 = datetime.datetime.now()
         # Print runtime
         print('Net running time: %s' % (t2 - t1))
