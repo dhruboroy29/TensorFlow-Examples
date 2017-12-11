@@ -4,6 +4,7 @@ from scipy.io import arff
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 import tensorflow as tf
 from sklearn.model_selection import KFold
+import os
 
 
 def logreg_nomad(train_filename, test_filenames, beta, learning_rate, training_epochs, display_step):
@@ -118,7 +119,7 @@ def logreg_nomad(train_filename, test_filenames, beta, learning_rate, training_e
         '''Get precision for test files'''
         # Idea: convert to one-hot, extract humans labels and corresponding features, run accuracy
         for cur_testfile in test_filenames:
-            cur_list = [train_filename, beta, learning_rate, cur_testfile];
+            cur_list = [train_filename, cur_testfile, beta, learning_rate];
 
             # Process .arff file
             testdataset = arff.loadarff(cur_testfile)
@@ -138,7 +139,7 @@ def logreg_nomad(train_filename, test_filenames, beta, learning_rate, training_e
             onehot_testlabels = onehot.transform(encoded_testlabels).toarray()
 
             # Extract humans
-            humans = testlabels[:,0]=='Human'
+            humans = onehot_testlabels[:,1]==1 # Only valid for Human-Dog radar datasets, since humans are 0 1 in one-hot
             onehot_testlabels_humans = onehot_testlabels[humans]
             testdata_humans = testdata[humans]
 
@@ -152,5 +153,40 @@ def logreg_nomad(train_filename, test_filenames, beta, learning_rate, training_e
     return csv_10foldtrain, csv_10foldtest
 
 
-if __name__ == "__main__":
-    print('Huribaba')
+def run_logreg(base_path, round, beta_list, learning_rate, training_epochs, display_step):
+    round_dir = os.path.join(base_path,'Round'+str(round))
+    training_dirs = [name for name in os.listdir(round_dir) if os.path.isdir(os.path.join(round_dir, name))]
+    training_dirs.sort()
+
+    csv_train = []
+    csv_test = []
+    for tr in training_dirs:
+        cur_training_dir = os.path.join(round_dir,tr,'combined')
+        cur_test_dir = os.path.join(round_dir,tr,'test')
+
+        # Get training file
+        tr_file = [os.path.join(cur_training_dir, f) for f in os.listdir(cur_training_dir) if f.endswith('.arff')]
+        # print('Training: ', tr_file)
+
+        # Get test files
+        tst_files = [os.path.join(cur_test_dir, f) for f in os.listdir(cur_test_dir) if f.endswith('.arff')]
+        tst_files.sort()
+        # print('Testing: ', tst_files)
+
+        for beta in beta_list:
+            csv_train_cur, csv_test_cur = logreg_nomad(tr_file[0],tst_files,beta,learning_rate,training_epochs,display_step)
+            csv_train.append(csv_train_cur)
+            csv_test = csv_test + csv_test_cur # Merge instead of append, to reduce extra redundant dimension
+
+    np.savetxt(os.path.join(round_dir,'training.csv'), csv_train, fmt='%s', delimiter=',')
+    np.savetxt(os.path.join(round_dir, 'testing.csv'), csv_test, fmt='%s', delimiter=',')
+
+if __name__=='__main__':
+    base_path = '/Users/Balderdash/Documents/BigEnvs_LogReg/BigEnvs_LogReg'
+    round = 2
+    beta_list = [0.01]
+    training_epochs = 10
+    display_step = 10
+    learning_rate = 0.5
+
+    run_logreg(base_path, round, beta_list, learning_rate, training_epochs, display_step)
