@@ -57,8 +57,8 @@ def logreg_nomad(train_filename, test_filenames, beta, learning_rate, training_e
     init = tf.global_variables_initializer()
 
     # Initialize csv_lists
-    csv_orig = [train_filename, beta, learning_rate]
-    csv_10fold = [train_filename, beta, learning_rate]
+    csv_10foldtrain = [train_filename, beta, learning_rate]
+    csv_10foldtest = []
 
     # Start training
     with tf.Session() as sess:
@@ -94,11 +94,14 @@ def logreg_nomad(train_filename, test_filenames, beta, learning_rate, training_e
             # Now test corresponding test partition
             acc_round = accuracy.eval({x: X_test, y: y_test})
             print("Round accuracy: ", acc_round, '\n')
-            csv_10fold.append(acc_round)
+            csv_10foldtrain.append(acc_round)
 
         '''
         Train original file
         '''
+        # Run the initializer
+        sess.run(init)
+
         # Print starting cost
         init_cost = sess.run(cost, feed_dict={x: data, y: onehot_labels})
         print("Epoch:", '%04d' % 0, "cost=", "{:.9f}".format(init_cost))
@@ -113,5 +116,39 @@ def logreg_nomad(train_filename, test_filenames, beta, learning_rate, training_e
         print('Optimization finished! Cost=%s' % c)
 
         '''Get precision for test files'''
+        # Idea: convert to one-hot, extract humans labels and corresponding features, run accuracy
+        for cur_testfile in test_filenames:
+            cur_list = [train_filename, beta, learning_rate, cur_testfile];
+
+            # Process .arff file
+            testdataset = arff.loadarff(cur_testfile)
+            df = pd.DataFrame(testdataset[0])
+
+            # Extract data and labels
+            testdata = df.select_dtypes(exclude=[object]).as_matrix()
+            testlabels = df.select_dtypes(include=[object])
+
+            # Encode labels
+            enc = LabelEncoder()
+            encoded_testlabels = testlabels.apply(enc.fit_transform)
+
+            # Convert labels to one-hot
+            onehot = OneHotEncoder()
+            onehot.fit(encoded_testlabels)
+            onehot_testlabels = onehot.transform(encoded_testlabels).toarray()
+
+            # Extract humans
+            humans = testlabels[:,0]=='Human'
+            onehot_testlabels_humans = onehot_testlabels[humans]
+            testdata_humans = testdata[humans]
+
+            precision = accuracy.eval({x: testdata_humans, y: onehot_testlabels_humans})
+            cur_list.append(precision)
+
+            # Append to main list
+            csv_10foldtest.append(cur_list)
+
+    # Return csv lists
+    return csv_10foldtrain, csv_10foldtest
 
 
