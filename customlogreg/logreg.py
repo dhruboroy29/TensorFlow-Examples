@@ -181,17 +181,18 @@ def run_logreg(base_path, round, beta_list, learning_rate, training_epochs, disp
     np.savetxt(os.path.join(round_dir,'training.csv'), csv_train, fmt='%s', delimiter=',')
     np.savetxt(os.path.join(round_dir, 'testing.csv'), csv_test, fmt='%s', delimiter=',')
 
-if __name__=='__main__':
+
+if __name__ == '__main__':
     base_path = '/Users/Balderdash/Documents/BigEnvs_LogReg/BigEnvs_LogReg'
-    round = 4
+    rounds = [2, 3, 4, 5]
     beta_list = [0.1, 0.01, 0.001, 0.0001]
     training_epochs = 2000
     display_step = 100
     learning_rate = 0.5
 
-    t1 = datetime.datetime.now()
-    run_logreg(base_path, round, beta_list, learning_rate, training_epochs, display_step)
-    t2 = datetime.datetime.now()
-
-    # Print runtime
-    print('Net running time: %ss' % (t2 - t1))
+    for round in rounds:
+        t1 = datetime.datetime.now()
+        run_logreg(base_path, round, beta_list, learning_rate, training_epochs, display_step)
+        t2 = datetime.datetime.now()
+        # Print runtime
+        print('Net running time: %s' % (t2 - t1))
