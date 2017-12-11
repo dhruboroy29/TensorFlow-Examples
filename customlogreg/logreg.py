@@ -5,7 +5,7 @@ from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 import tensorflow as tf
 from sklearn.model_selection import KFold
 import os
-
+import datetime
 
 def logreg_nomad(train_filename, test_filenames, beta, learning_rate, training_epochs, display_step):
     # Process .arff file
@@ -183,10 +183,15 @@ def run_logreg(base_path, round, beta_list, learning_rate, training_epochs, disp
 
 if __name__=='__main__':
     base_path = '/Users/Balderdash/Documents/BigEnvs_LogReg/BigEnvs_LogReg'
-    round = 2
-    beta_list = [0.01]
-    training_epochs = 10
-    display_step = 10
+    round = 4
+    beta_list = [0.1, 0.01, 0.001, 0.0001]
+    training_epochs = 2000
+    display_step = 100
     learning_rate = 0.5
 
+    t1 = datetime.datetime.now()
     run_logreg(base_path, round, beta_list, learning_rate, training_epochs, display_step)
+    t2 = datetime.datetime.now()
+
+    # Print runtime
+    print('Net running time: %ss' % (t2 - t1))
