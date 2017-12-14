@@ -158,7 +158,7 @@ with tf.device('/cpu:0'):
         # Run the initializer
         sess.run(init)
 
-        # Keep training until reach max iterations
+        # Keep training until reach max_x iterations
         for step in range(1, num_steps + 1):
             # Get a batch for each GPU
             batch_x, batch_y = mnist.train.next_batch(batch_size * num_gpus)

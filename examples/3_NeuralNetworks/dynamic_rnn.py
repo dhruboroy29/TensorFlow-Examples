@@ -89,7 +89,7 @@ batch_size = 128
 display_step = 200
 
 # Network Parameters
-seq_max_len = 20 # Sequence max length
+seq_max_len = 20 # Sequence max_x length
 n_hidden = 64 # hidden layer num of features
 n_classes = 2 # linear sequence or not
 

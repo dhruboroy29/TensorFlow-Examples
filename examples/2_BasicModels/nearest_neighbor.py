@@ -27,7 +27,7 @@ xte = tf.placeholder("float", [784])
 # Nearest Neighbor calculation using L1 Distance
 # Calculate L1 Distance
 distance = tf.reduce_sum(tf.abs(tf.add(xtr, tf.negative(xte))), reduction_indices=1)
-# Prediction: Get min distance index (Nearest neighbor)
+# Prediction: Get min_x distance index (Nearest neighbor)
 pred = tf.arg_min(distance, 0)
 
 accuracy = 0.
