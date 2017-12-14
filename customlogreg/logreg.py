@@ -36,7 +36,7 @@ def logreg_nomad(train_filename, test_filenames, beta, learning_rate, training_e
     y = tf.placeholder(tf.float32, [None, num_classes])
 
     # Set model weights
-    W = tf.Variable(tf.zeros([num_features, num_classes]))
+    W = tf.Variable(tf.ones([num_features, num_classes]))
     b = tf.Variable(tf.zeros([num_classes]))
 
     # Construct model
