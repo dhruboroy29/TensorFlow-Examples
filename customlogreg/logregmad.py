@@ -91,8 +91,15 @@ def compute_logregmad(single_env_files, num_features, beta, training_epochs, lea
     mad1 = np.median(abs(f_w1 - np.median(f_w1, 0)), 0) # class1
     mad2 = np.median(abs(f_w2 - np.median(f_w2, 0)), 0)  # class2
 
-    return np.vstack((mad1, mad2)) # Return MAD matrix
+    mad = np.vstack((mad1, mad2)) # Return MAD matrix
 
+    # Normalize and return
+    max_m = np.max(mad,1)
+    min_m = np.min(mad,1)
+
+    max_m = max_m.reshape([max_m.size, 1])
+    min_m = min_m.reshape([min_m.size, 1])
+    return (mad-min_m)/(max_m-min_m)
 
 
 def compute_featuremad(mat):
@@ -337,12 +344,12 @@ def run_logreg_logregmad(base_path, round, beta_list, learning_rate, training_ep
         single_env_files.sort()
 
         for beta in beta_list:
-            csv_train_cur, csv_test_cur = logreg_mad(tr_file[0],tst_files, single_env_files, 'logregmad', beta, learning_rate, training_epochs, display_step)
+            csv_train_cur, csv_test_cur = logreg_mad(tr_file[0],tst_files, single_env_files, 'logregmad', beta, learning_rate, training_epochs, display_step, rescale=False)
             csv_train.append(csv_train_cur)
             csv_test = csv_test + csv_test_cur # Merge instead of append, to reduce extra redundant dimension
 
-    np.savetxt(os.path.join(round_dir,'training_logregmad.csv'), csv_train, fmt='%s', delimiter=',')
-    np.savetxt(os.path.join(round_dir, 'testing_logregmad.csv'), csv_test, fmt='%s', delimiter=',')
+    np.savetxt(os.path.join(round_dir,'training_logregmad_madscaled.csv'), csv_train, fmt='%s', delimiter=',')
+    np.savetxt(os.path.join(round_dir, 'testing_logregmad_madscaled.csv'), csv_test, fmt='%s', delimiter=',')
 
 
 def run_logreg_infogainmad(base_path, round, beta_list, learning_rate, training_epochs, display_step):
@@ -410,7 +417,7 @@ def run_logreg_mrmrmad(base_path, round, beta_list, learning_rate, training_epoc
 
 
 if __name__ == '__main__':
-    base_path = '/media/mydrive/Robust_Learning/Results/Logistic_Results/BigEnvs_LogReg'
+    base_path = '/Users/Balderdash/Documents/BigEnvs_LogReg/BigEnvs_LogReg'
     rounds = [2, 3, 4, 5]
     beta_list = [0.1, 0.01, 0.001, 0.0001]
     epochs = 2000
