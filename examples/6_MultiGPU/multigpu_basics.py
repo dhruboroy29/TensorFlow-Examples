@@ -1,4 +1,9 @@
 from __future__ import print_function
+import numpy as np
+import tensorflow as tf
+import datetime
+import os
+
 '''
 Basic Multi GPU computation example using TensorFlow library.
 
@@ -13,11 +18,8 @@ This tutorial requires your machine to have 2 GPUs
 "/gpu:1": The second GPU of your machine
 '''
 
-
-
-import numpy as np
-import tensorflow as tf
-import datetime
+# Suppress (some) annoying Tensorflow debugging output
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
 
 # Processing Units logs
 log_device_placement = True
