@@ -31,7 +31,8 @@ layer2_dense = keras.layers.Dense(128, activation='relu')(flat)
 #output_preds = tf.layers.dense(inputs=layer2_dense, units=10, activation=tf.nn.softmax)
 
 # Or, equivalently, fully-connected Output Layer (Keras layer)
-output_preds = keras.layers.Dense(10, activation='softmax')(layer2_dense)
+with tf.variable_scope("gud"):
+    output_preds = keras.layers.Dense(10, activation='softmax')(layer2_dense)
 
 # True labels (TensorFlow layer
 labels = tf.placeholder(tf.float32, shape=(None, 10))
@@ -39,6 +40,9 @@ labels = tf.placeholder(tf.float32, shape=(None, 10))
 # Loss model from Keras
 from keras.objectives import categorical_crossentropy
 loss = tf.reduce_mean(categorical_crossentropy(labels, output_preds))
+
+vars = tf.trainable_variables()
+[print(var.name) for var in vars]
 
 
 '''Load lata'''
