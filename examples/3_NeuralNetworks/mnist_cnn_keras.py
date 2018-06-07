@@ -5,6 +5,9 @@ Gets to 99.25% test accuracy after 12 epochs
 '''
 
 from __future__ import print_function
+
+import pickle
+
 import keras
 from keras.datasets import mnist
 from keras.models import Sequential
@@ -64,6 +67,10 @@ history=model.fit(x_train, y_train,
           epochs=epochs,
           verbose=1,
           validation_data=(x_test, y_test))
+# Save history file
+with open('/trainHistoryDict', 'wb') as file_pi:
+    pickle.dump(history.history, file_pi)
+
 score = model.evaluate(x_test, y_test, verbose=0)
 print('Test loss:', score[0])
 print('Test accuracy:', score[1])
