@@ -17,7 +17,7 @@ from keras import backend as K
 
 batch_size = 128
 num_classes = 10
-epochs = 12
+epochs = 1
 
 # input image dimensions
 img_rows, img_cols = 28, 28
@@ -68,7 +68,7 @@ history=model.fit(x_train, y_train,
           verbose=1,
           validation_data=(x_test, y_test))
 # Save history file
-with open('/trainHistoryDict', 'wb') as file_pi:
+with open('trainHistoryDict.pkl', 'wb') as file_pi:
     pickle.dump(history.history, file_pi)
 
 score = model.evaluate(x_test, y_test, verbose=0)

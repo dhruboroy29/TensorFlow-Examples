@@ -21,17 +21,25 @@ conv1 = tf.layers.conv2d(
     padding="same",
     activation=tf.nn.relu)
 
-# Flatten conv output (TensorFlow layer)
-flat = tf.layers.flatten(conv1)
+# Convolutional Layer #2 (Keras layer)
+conv2 = keras.layers.Conv2D(32, [5,5], padding="same", activation="relu")(conv1)
+
+# Flatten conv output (Keras layer)
+# flat = tf.layers.flatten(conv2)
+flat = keras.layers.Flatten()(conv2)
 
 # Fully-connected Layer #1 (Keras layer)
 layer2_dense = keras.layers.Dense(128, activation='relu')(flat)
+
+from tensorflow.python.framework import ops
+x = ops.convert_to_tensor(layer2_dense, name="x")
+print('Shape of layer2_dense:', x.get_shape().as_list())
 
 # Fully-connected Output Layer (TensorFlow layer) - DOES NOT WORK: WTF!
 #output_preds = tf.layers.dense(inputs=layer2_dense, units=10, activation=tf.nn.softmax)
 
 # Or, equivalently, fully-connected Output Layer (Keras layer)
-with tf.variable_scope("gud"):
+with tf.variable_scope("Test"):
     output_preds = keras.layers.Dense(10, activation='softmax')(layer2_dense)
 
 # True labels (TensorFlow layer
@@ -41,9 +49,13 @@ labels = tf.placeholder(tf.float32, shape=(None, 10))
 from keras.objectives import categorical_crossentropy
 loss = tf.reduce_mean(categorical_crossentropy(labels, output_preds))
 
+# Print names of trainable variables
+print('-------------------')
+print('Trainable variables')
+print('-------------------')
 vars = tf.trainable_variables()
 [print(var.name) for var in vars]
-
+print('-------------------')
 
 '''Load lata'''
 from tensorflow.examples.tutorials.mnist import input_data
@@ -64,7 +76,8 @@ sess.run(init_op)
 with sess.as_default():
     for i in range(10000):
         batch = mnist_data.train.next_batch(50)
-        train_step.run(feed_dict={img: batch[0], labels: batch[1]})
+        #train_step.run(feed_dict={img: batch[0], labels: batch[1]})
+        sess.run(train_step, feed_dict={img: batch[0], labels: batch[1]})
 
 
 '''Evaluate model - Keras'''
