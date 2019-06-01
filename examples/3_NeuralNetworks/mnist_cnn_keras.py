@@ -13,11 +13,12 @@ from keras.datasets import mnist
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten
 from keras.layers import Conv2D, MaxPooling2D
+from keras.callbacks import TensorBoard
 from keras import backend as K
 
 batch_size = 128
 num_classes = 10
-epochs = 1
+epochs = 10
 
 # input image dimensions
 img_rows, img_cols = 28, 28
@@ -46,7 +47,7 @@ print(x_test.shape[0], 'test samples')
 y_train = keras.utils.to_categorical(y_train, num_classes)
 y_test = keras.utils.to_categorical(y_test, num_classes)
 
-model = Sequential()
+model = Sequential(name='conv_3x3_mnist')
 model.add(Conv2D(32, kernel_size=(3, 3),
                  activation='relu',
                  input_shape=input_shape))
@@ -62,11 +63,14 @@ model.compile(loss=keras.losses.categorical_crossentropy,
               optimizer=keras.optimizers.Adadelta(),
               metrics=['accuracy'])
 
+# Initialize callback
+tb = TensorBoard(log_dir='/Users/Balderdash/Desktop/logs')
+
 history=model.fit(x_train, y_train,
           batch_size=batch_size,
           epochs=epochs,
           verbose=1,
-          validation_data=(x_test, y_test))
+          validation_data=(x_test, y_test), callbacks=[tb])
 # Save history file
 with open('trainHistoryDict.pkl', 'wb') as file_pi:
     pickle.dump(history.history, file_pi)
